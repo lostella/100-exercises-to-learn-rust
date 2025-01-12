@@ -8,3 +8,102 @@
 //   It should be possible to print its debug representation.
 //
 // Tests are located in the `tests` folder—pay attention to the visibility of your types and methods.
+
+use std::cmp::{Ordering, PartialOrd};
+use std::convert::From;
+use std::ops::Add;
+
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
+pub struct SaturatingU16 {
+    value: u16,
+}
+
+impl From<u16> for SaturatingU16 {
+    fn from(value: u16) -> Self {
+        Self { value }
+    }
+}
+
+impl From<&u16> for SaturatingU16 {
+    fn from(value: &u16) -> Self {
+        Self { value: *value }
+    }
+}
+
+impl From<u8> for SaturatingU16 {
+    fn from(value: u8) -> Self {
+        Self {
+            value: value as u16,
+        }
+    }
+}
+
+impl From<&u8> for SaturatingU16 {
+    fn from(value: &u8) -> Self {
+        Self {
+            value: *value as u16,
+        }
+    }
+}
+
+impl Add for SaturatingU16 {
+    type Output = SaturatingU16;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Self::Output {
+            value: self.value.saturating_add(rhs.value),
+        }
+    }
+}
+
+impl Add<&SaturatingU16> for SaturatingU16 {
+    type Output = SaturatingU16;
+
+    fn add(self, rhs: &SaturatingU16) -> Self::Output {
+        Self::Output {
+            value: self.value.saturating_add(rhs.value),
+        }
+    }
+}
+
+impl Add<u16> for SaturatingU16 {
+    type Output = SaturatingU16;
+
+    fn add(self, rhs: u16) -> Self::Output {
+        Self::Output {
+            value: self.value.saturating_add(rhs),
+        }
+    }
+}
+
+impl Add<&u16> for SaturatingU16 {
+    type Output = SaturatingU16;
+
+    fn add(self, rhs: &u16) -> Self::Output {
+        Self::Output {
+            value: self.value.saturating_add(*rhs),
+        }
+    }
+}
+
+impl PartialEq<u16> for SaturatingU16 {
+    fn eq(&self, other: &u16) -> bool {
+        if self.value == *other {
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl PartialOrd<u16> for SaturatingU16 {
+    fn partial_cmp(&self, other: &u16) -> Option<Ordering> {
+        if self.value < *other {
+            Some(Ordering::Less)
+        } else if self.value > *other {
+            Some(Ordering::Greater)
+        } else {
+            Some(Ordering::Equal)
+        }
+    }
+}
